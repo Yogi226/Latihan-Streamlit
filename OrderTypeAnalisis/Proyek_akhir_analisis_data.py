@@ -65,16 +65,23 @@ if visualize_button:
         - **Sumbu Y**: Jumlah transaksi yang menggunakan masing-masing tipe pembayaran.
         """)
 
-        payment_type_counts = df['payment_type'].value_counts()
-        fig, ax = plt.subplots(figsize=(8, 6))
-        sns.barplot(x=payment_type_counts.index, y=payment_type_counts.values, palette='viridis', ax=ax, hue=payment_type_counts.index, legend=False)
-        ax.set_xlabel('Tipe Pembayaran')
-        ax.set_ylabel('Jumlah Transaksi')
-        ax.set_title('Frekuensi Penggunaan Tipe Pembayaran')
-        # Menambahkan anotasi tiap batang
-        for i, v in enumerate(payment_type_counts.values):
-            ax.text(i, v + 0.5, str(v), color='black', ha='center')
-        st.pyplot(fig)
+        @st.experimental_memo
+        def get_payment_type_counts(data):
+            return data['payment_type'].value_counts()
+        
+        payment_type_counts = get_payment_type_counts(df)
+        
+        with st.spinner("Membuat visualisasi Frekuensi Tipe Pembayaran, harap tunggu..."):
+            fig, ax = plt.subplots(figsize=(8, 6))
+            sns.barplot(x=payment_type_counts.index, y=payment_type_counts.values, 
+                        palette='viridis', ax=ax, hue=payment_type_counts.index, legend=False)
+            ax.set_xlabel('Tipe Pembayaran')
+            ax.set_ylabel('Jumlah Transaksi')
+            ax.set_title('Frekuensi Penggunaan Tipe Pembayaran')
+            # Menambahkan anotasi pada tiap batang
+            for i, v in enumerate(payment_type_counts.values):
+                ax.text(i, v + 0.5, str(v), color='black', ha='center')
+            st.pyplot(fig, use_container_width=True)
 
     # Visualisasi Distribusi Nilai Pembayaran (menggunakan box plot)
     elif visualization == 'Distribusi Nilai Pembayaran':
@@ -100,14 +107,15 @@ if visualize_button:
         - Deteksi outliers atau transaksi dengan nilai yang ekstrem.
         """)
 
-        # Membuat box plot untuk distribusi nilai pembayaran
-        fig, ax = plt.subplots(figsize=(10, 6))
-        sns.violinplot(x='payment_type', y='payment_value', data=df, palette='Set2', ax=ax, hue='payment_type', legend=False)
-        sns.swarmplot(x='payment_type', y='payment_value', data=df, color='k', size=3, ax=ax)
-        ax.set_xlabel('Tipe Pembayaran')
-        ax.set_ylabel('Nilai Pembayaran')
-        ax.set_title('Distribusi Nilai Pembayaran per Tipe Pembayaran')
-        st.pyplot(fig)
+        with st.spinner("Membuat visualisasi Distribusi Nilai Pembayaran, harap tunggu..."):
+            fig, ax = plt.subplots(figsize=(10, 6))
+            sns.violinplot(x='payment_type', y='payment_value', data=df, palette='Set2', 
+                           ax=ax, hue='payment_type', legend=False)
+            sns.swarmplot(x='payment_type', y='payment_value', data=df, color='k', size=3, ax=ax)
+            ax.set_xlabel('Tipe Pembayaran')
+            ax.set_ylabel('Nilai Pembayaran')
+            ax.set_title('Distribusi Nilai Pembayaran per Tipe Pembayaran')
+            st.pyplot(fig, use_container_width=True)
 
     # Visualisasi Total Nilai Pembayaran per Tipe Pembayaran
     elif visualization == 'Total Nilai Pembayaran per Tipe Pembayaran':
@@ -123,15 +131,22 @@ if visualize_button:
         - **Sumbu Y**: Total nilai pembayaran yang menggunakan masing-masing tipe pembayaran.
         """)
 
-        total_payment_value = df.groupby('payment_type')['payment_value'].sum().sort_values(ascending=True)
-        fig, ax = plt.subplots(figsize=(10, 6))
-        sns.barplot(x=total_payment_value.values, y=total_payment_value.index, palette='coolwarm', ax=ax)
-        ax.set_xlabel('Total Nilai Pembayaran')
-        ax.set_ylabel('Tipe Pembayaran')
-        ax.set_title('Total Nilai Pembayaran per Tipe Pembayaran')
-        for i, v in enumerate(total_payment_value.values):
-            ax.text(v + max(total_payment_value.values)*0.01, i, str(round(v, 2)), color='black', va='center')
-        st.pyplot(fig)
+        @st.experimental_memo
+        def get_total_payment_value(data):
+            return data.groupby('payment_type')['payment_value'].sum().sort_values(ascending=True)
+        
+        total_payment_value = get_total_payment_value(df)
+        
+        with st.spinner("Membuat visualisasi Total Nilai Pembayaran, harap tunggu..."):
+            fig, ax = plt.subplots(figsize=(10, 6))
+            sns.barplot(x=total_payment_value.values, y=total_payment_value.index, palette='coolwarm', ax=ax)
+            ax.set_xlabel('Total Nilai Pembayaran')
+            ax.set_ylabel('Tipe Pembayaran')
+            ax.set_title('Total Nilai Pembayaran per Tipe Pembayaran')
+            # Menambahkan anotasi pada tiap batang
+            for i, v in enumerate(total_payment_value.values):
+                ax.text(v + max(total_payment_value.values)*0.01, i, str(round(v, 2)), color='black', va='center')
+            st.pyplot(fig, use_container_width=True)
 
     # Visualisasi Rata-rata Nilai Pembayaran per Tipe Pembayaran
     elif visualization == 'Rata-rata Nilai Pembayaran per Tipe Pembayaran':
@@ -147,15 +162,22 @@ if visualize_button:
         - **Sumbu Y**: Rata-rata nilai pembayaran yang menggunakan masing-masing tipe pembayaran.
         """)
 
-        avg_payment_value = df.groupby('payment_type')['payment_value'].mean().sort_values(ascending=True)
-        fig, ax = plt.subplots(figsize=(10, 6))
-        sns.barplot(x=avg_payment_value.values, y=avg_payment_value.index, palette='magma', ax=ax)
-        ax.set_xlabel('Rata-rata Nilai Pembayaran')
-        ax.set_ylabel('Tipe Pembayaran')
-        ax.set_title('Rata-rata Nilai Pembayaran per Tipe Pembayaran')
-        for i, v in enumerate(avg_payment_value.values):
-            ax.text(v + max(avg_payment_value.values)*0.01, i, str(round(v, 2)), color='black', va='center')
-        st.pyplot(fig)
+        @st.experimental_memo
+        def get_avg_payment_value(data):
+            return data.groupby('payment_type')['payment_value'].mean().sort_values(ascending=True)
+        
+        avg_payment_value = get_avg_payment_value(df)
+        
+        with st.spinner("Membuat visualisasi Rata-rata Nilai Pembayaran, harap tunggu..."):
+            fig, ax = plt.subplots(figsize=(10, 6))
+            sns.barplot(x=avg_payment_value.values, y=avg_payment_value.index, palette='magma', ax=ax)
+            ax.set_xlabel('Rata-rata Nilai Pembayaran')
+            ax.set_ylabel('Tipe Pembayaran')
+            ax.set_title('Rata-rata Nilai Pembayaran per Tipe Pembayaran')
+            # Menambahkan anotasi pada tiap batang
+            for i, v in enumerate(avg_payment_value.values):
+                ax.text(v + max(avg_payment_value.values)*0.01, i, str(round(v, 2)), color='black', va='center')
+            st.pyplot(fig, use_container_width=True)
 
     # Visualisasi Distribusi Jumlah Cicilan Pembayaran
     elif visualization == 'Distribusi Jumlah Cicilan Pembayaran':
@@ -181,10 +203,10 @@ if visualize_button:
         - Deteksi outliers atau transaksi dengan jumlah cicilan yang ekstrem.
         """)
 
-        # Membuat box plot untuk distribusi jumlah cicilan pembayaran
-        fig, ax = plt.subplots(figsize=(10, 6))
-        sns.violinplot(x='payment_installments', y='payment_type', data=df, palette='Pastel1', ax=ax)
-        ax.set_xlabel('Jumlah Cicilan')
-        ax.set_ylabel('Tipe Pembayaran')
-        ax.set_title('Distribusi Jumlah Cicilan Pembayaran per Tipe Pembayaran')
-        st.pyplot(fig)
+        with st.spinner("Membuat visualisasi Distribusi Jumlah Cicilan Pembayaran, harap tunggu..."):
+            fig, ax = plt.subplots(figsize=(10, 6))
+            sns.violinplot(x='payment_installments', y='payment_type', data=df, palette='Pastel1', ax=ax)
+            ax.set_xlabel('Jumlah Cicilan')
+            ax.set_ylabel('Tipe Pembayaran')
+            ax.set_title('Distribusi Jumlah Cicilan Pembayaran per Tipe Pembayaran')
+            st.pyplot(fig, use_container_width=True)
