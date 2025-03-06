@@ -8,7 +8,7 @@ import streamlit as st
 @st.cache_data
 def load_data():
     # Ganti 'order_payments_dataset.csv' dengan path file csv kamu
-    df = pd.read_csv('order_payments_dataset.csv')
+    df = pd.read_csv('OrderTypeAnalisis/order_payments_dataset.csv')
     return df
 
 # Pastikan kamu memanggil fungsi load_data() dengan tanda kurung
