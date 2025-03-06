@@ -65,7 +65,7 @@ if visualize_button:
         - **Sumbu Y**: Jumlah transaksi yang menggunakan masing-masing tipe pembayaran.
         """)
 
-        @st.experimental_memo
+        @st.cache_data
         def get_payment_type_counts(data):
             return data['payment_type'].value_counts()
         
@@ -131,7 +131,7 @@ if visualize_button:
         - **Sumbu Y**: Total nilai pembayaran yang menggunakan masing-masing tipe pembayaran.
         """)
 
-        @st.experimental_memo
+        @st.cache_data
         def get_total_payment_value(data):
             return data.groupby('payment_type')['payment_value'].sum().sort_values(ascending=True)
         
@@ -162,7 +162,7 @@ if visualize_button:
         - **Sumbu Y**: Rata-rata nilai pembayaran yang menggunakan masing-masing tipe pembayaran.
         """)
 
-        @st.experimental_memo
+        @st.cache_data
         def get_avg_payment_value(data):
             return data.groupby('payment_type')['payment_value'].mean().sort_values(ascending=True)
         
